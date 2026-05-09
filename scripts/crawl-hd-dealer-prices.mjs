@@ -35,14 +35,33 @@ async function fetchInventoryHtml(modelId, zip) {
     search: zip,
     zipCode: zip,
   });
-  const response = await fetch(`${INVENTORY_URL}?${params}`, {
-    headers: {
-      "user-agent":
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X) AppleWebKit/537.36 Chrome Safari",
-    },
-  });
-  if (!response.ok) return "";
-  return response.text();
+  const url = `${INVENTORY_URL}?${params}`;
+  try {
+    const response = await fetch(url, {
+      headers: {
+        "user-agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X) AppleWebKit/537.36 Chrome Safari",
+      },
+    });
+    if (!response.ok) {
+      return {
+        ok: false,
+        zip,
+        status: response.status,
+        url,
+        error: `HTTP ${response.status}`,
+      };
+    }
+    return { ok: true, zip, status: response.status, url, html: await response.text() };
+  } catch (error) {
+    return {
+      ok: false,
+      zip,
+      status: null,
+      url,
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
 }
 
 function extractVisibleListings(html, model) {
@@ -73,15 +92,22 @@ function extractVisibleListings(html, model) {
   return uniqueBy(listings, (listing) => `${listing.modelId}:${listing.price}:${listing.rawSnippet}`);
 }
 
-function summarize(model, listings, marketsSampled) {
+function summarize(model, listings, marketsSampled, failedMarkets) {
   if (!listings.length) {
     const estimate = extrapolateDealerPrice(model);
     const msrp = model.metrics?.msrp ?? null;
     const delta = estimate && msrp ? estimate - msrp : null;
+    const pricingBasis =
+      marketsSampled.length === 0
+        ? `Inventory crawl failed for all markets; extrapolated as MSRP plus estimated freight (${DEFAULT_FREIGHT}).`
+        : failedMarkets.length
+          ? `No crawlable advertised listings in successful markets; ${failedMarkets.length} markets failed; extrapolated as MSRP plus estimated freight (${DEFAULT_FREIGHT}).`
+          : `No crawlable advertised listings; extrapolated as MSRP plus estimated freight (${DEFAULT_FREIGHT}).`;
     return {
       status: "extrapolated",
       sampleCount: 0,
       marketsSampled,
+      failedMarkets,
       averageAdvertisedPrice: null,
       lowestAdvertisedPrice: null,
       highestAdvertisedPrice: null,
@@ -90,7 +116,7 @@ function summarize(model, listings, marketsSampled) {
       extrapolatedAveragePrice: estimate,
       extrapolatedDeltaFromMsrp: delta,
       extrapolatedDeltaPercent: msrp && delta !== null ? Number(((delta / msrp) * 100).toFixed(1)) : null,
-      pricingBasis: `No crawlable advertised listings; extrapolated as MSRP plus estimated freight (${DEFAULT_FREIGHT}).`,
+      pricingBasis,
       listings: [],
     };
   }
@@ -103,6 +129,7 @@ function summarize(model, listings, marketsSampled) {
     status: listings.length < 3 ? "limited-sample" : "sampled",
     sampleCount: listings.length,
     marketsSampled,
+    failedMarkets,
     averageAdvertisedPrice: average,
     lowestAdvertisedPrice: Math.min(...prices),
     highestAdvertisedPrice: Math.max(...prices),
@@ -123,22 +150,33 @@ async function main() {
   for (const model of data.models) {
     const listings = [];
     const sampled = [];
+    const failed = [];
     for (const zip of MARKETS) {
       process.stderr.write(`Sampling ${model.id} in ${zip}\n`);
-      const html = await fetchInventoryHtml(model.id, zip);
+      const result = await fetchInventoryHtml(model.id, zip);
+      if (!result.ok) {
+        failed.push({
+          zip,
+          status: result.status,
+          error: result.error,
+          sourceUrl: result.url,
+        });
+        continue;
+      }
       sampled.push(zip);
       listings.push(
-        ...extractVisibleListings(html, model).map((listing) => ({
+        ...extractVisibleListings(result.html, model).map((listing) => ({
           ...listing,
           market: zip,
-          sourceUrl: `${INVENTORY_URL}?model=${encodeURIComponent(model.id)}&zipCode=${zip}`,
+          sourceUrl: result.url,
         }))
       );
     }
     model.dealerPricing = summarize(
       model,
       uniqueBy(listings, (listing) => `${listing.market}:${listing.price}:${listing.rawSnippet}`),
-      sampled
+      sampled,
+      failed
     );
   }
 

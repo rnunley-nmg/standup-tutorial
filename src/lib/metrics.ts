@@ -31,6 +31,12 @@ export type DealerPricing = {
   extrapolatedDeltaPercent: number | null;
   pricingBasis: string;
   marketsSampled: string[];
+  failedMarkets?: Array<{
+    zip: string;
+    status: number | null;
+    error: string;
+    sourceUrl: string;
+  }>;
 };
 
 export type BikeModel = {
@@ -63,4 +69,10 @@ export function effectivePrice(model: BikeModel) {
 
 export function hasUsableDealerSample(model: BikeModel) {
   return model.dealerPricing.status === "sampled" || model.dealerPricing.status === "limited-sample";
+}
+
+export function dealerPriceLabel(model: BikeModel) {
+  if (hasUsableDealerSample(model)) return "Dealer Avg";
+  if (model.dealerPricing.status === "extrapolated") return "Est. Price";
+  return "MSRP";
 }

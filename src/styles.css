@@ -216,6 +216,20 @@ main {
   grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
 }
 
+.emptyState {
+  background: var(--white);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem;
+}
+
+.emptyState strong {
+  color: var(--ink);
+  text-transform: uppercase;
+}
+
 .modelCard,
 .detailPanel,
 .tableSection {

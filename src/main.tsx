@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import data from "./data/harley-lineup.json";
 import { formatCurrency, formatNumber, formatPercent, formatSignedCurrency } from "./lib/format";
-import { BikeModel, effectivePrice, hasUsableDealerSample } from "./lib/metrics";
+import { BikeModel, dealerPriceLabel, effectivePrice, hasUsableDealerSample } from "./lib/metrics";
 import "./styles.css";
 
 type SortKey =
@@ -50,7 +50,7 @@ const metricLabels: Record<string, string> = {
   runningWeight: "Weight",
   seatHeight: "Seat",
   msrp: "MSRP",
-  dealerAverage: "Dealer Avg",
+  dealerAverage: "Dealer/Est.",
   costPerHp: "$/HP",
   costPerTorque: "$/LB-FT",
   averageDeltaPercent: "Dealer Delta",
@@ -64,7 +64,7 @@ const metricLabels: Record<string, string> = {
 
 const sortOptions: Array<{ key: SortKey; label: string; direction: "asc" | "desc" }> = [
   { key: "powerWeight", label: "Power-to-weight", direction: "desc" },
-  { key: "dealer", label: "Dealer average", direction: "asc" },
+  { key: "dealer", label: "Dealer/est. price", direction: "asc" },
   { key: "costHp", label: "Cost per HP", direction: "asc" },
   { key: "torque", label: "Torque", direction: "desc" },
   { key: "range", label: "Estimated range", direction: "desc" },
@@ -166,7 +166,7 @@ function App() {
       });
   }, [category, query, sort.direction, sortKey]);
 
-  const activeModel = lineup.find((model) => model.id === activeModelId) ?? visibleModels[0] ?? lineup[0];
+  const activeModel = visibleModels.find((model) => model.id === activeModelId) ?? visibleModels[0] ?? null;
   const selectedModels = selectedIds
     .map((id) => lineup.find((model) => model.id === id))
     .filter(Boolean) as BikeModel[];
@@ -254,9 +254,15 @@ function App() {
 
         <section className="contentGrid">
           <div className="modelGrid" aria-label="Motorcycle cards">
+            {visibleModels.length === 0 && (
+              <div className="emptyState">
+                <strong>No matching models</strong>
+                <span>Try a different category or search term.</span>
+              </div>
+            )}
             {visibleModels.map((model) => (
               <article
-                className={`modelCard ${model.id === activeModel.id ? "active" : ""}`}
+                className={`modelCard ${model.id === activeModel?.id ? "active" : ""}`}
                 key={model.id}
                 onClick={() => setActiveModelId(model.id)}
               >
@@ -287,7 +293,7 @@ function App() {
                       <strong>{formatCurrency(model.metrics.msrp)}</strong>
                     </div>
                     <div>
-                      <span>Dealer Avg</span>
+                      <span>{dealerPriceLabel(model)}</span>
                       <strong>{formatCurrency(effectivePrice(model))}</strong>
                     </div>
                   </div>
@@ -321,70 +327,77 @@ function App() {
             ))}
           </div>
 
-          <aside className="detailPanel">
-            <div className="panelHeader">
-              <p>{activeModel.modelCode}</p>
-              <h2>{activeModel.name}</h2>
-              <a href={activeModel.url} target="_blank" rel="noreferrer">
-                View official page
-              </a>
-            </div>
-
-            <div className="dealerBox">
-              <div>
-                <p>Dealer advertised average</p>
-                <strong>{formatCurrency(effectivePrice(activeModel))}</strong>
+          {activeModel ? (
+            <aside className="detailPanel">
+              <div className="panelHeader">
+                <p>{activeModel.modelCode}</p>
+                <h2>{activeModel.name}</h2>
+                <a href={activeModel.url} target="_blank" rel="noreferrer">
+                  View official page
+                </a>
               </div>
-              <span className={hasUsableDealerSample(activeModel) ? "sampled" : "unsampled"}>
-                {dealerStatus(activeModel)}
-              </span>
-              <small>
-                Delta vs MSRP:{" "}
-                {formatSignedCurrency(
-                  activeModel.dealerPricing.averageDeltaFromMsrp ??
-                    activeModel.dealerPricing.extrapolatedDeltaFromMsrp
-                )}{" "}
-                (
-                {formatPercent(
-                  activeModel.dealerPricing.averageDeltaPercent ??
-                    activeModel.dealerPricing.extrapolatedDeltaPercent
-                )}
-                )
-              </small>
-              <small>{activeModel.dealerPricing.pricingBasis}</small>
-            </div>
 
-            <div className="metricList">
-              {(presets[preset] as readonly string[]).map((key) => (
-                <div key={key}>
-                  <span>{metricLabels[key]}</span>
-                  <strong>{displayMetric(key, metricValue(activeModel, key))}</strong>
+              <div className="dealerBox">
+                <div>
+                  <p>{hasUsableDealerSample(activeModel) ? "Dealer advertised average" : "Estimated price"}</p>
+                  <strong>{formatCurrency(effectivePrice(activeModel))}</strong>
                 </div>
-              ))}
-            </div>
+                <span className={hasUsableDealerSample(activeModel) ? "sampled" : "unsampled"}>
+                  {dealerStatus(activeModel)}
+                </span>
+                <small>
+                  Delta vs MSRP:{" "}
+                  {formatSignedCurrency(
+                    activeModel.dealerPricing.averageDeltaFromMsrp ??
+                      activeModel.dealerPricing.extrapolatedDeltaFromMsrp
+                  )}{" "}
+                  (
+                  {formatPercent(
+                    activeModel.dealerPricing.averageDeltaPercent ??
+                      activeModel.dealerPricing.extrapolatedDeltaPercent
+                  )}
+                  )
+                </small>
+                <small>{activeModel.dealerPricing.pricingBasis}</small>
+              </div>
 
-            <div className="specBlock">
-              <h3>Mechanical Notes</h3>
-              <dl>
-                <div>
-                  <dt>Engine</dt>
-                  <dd>{activeModel.specs.engine}</dd>
-                </div>
-                <div>
-                  <dt>Front</dt>
-                  <dd>{activeModel.specs.frontFork}</dd>
-                </div>
-                <div>
-                  <dt>Rear</dt>
-                  <dd>{activeModel.specs.rearShocks}</dd>
-                </div>
-                <div>
-                  <dt>Brakes</dt>
-                  <dd>{activeModel.specs.brakeCaliperType}</dd>
-                </div>
-              </dl>
-            </div>
-          </aside>
+              <div className="metricList">
+                {(presets[preset] as readonly string[]).map((key) => (
+                  <div key={key}>
+                    <span>{metricLabels[key]}</span>
+                    <strong>{displayMetric(key, metricValue(activeModel, key))}</strong>
+                  </div>
+                ))}
+              </div>
+
+              <div className="specBlock">
+                <h3>Mechanical Notes</h3>
+                <dl>
+                  <div>
+                    <dt>Engine</dt>
+                    <dd>{activeModel.specs.engine}</dd>
+                  </div>
+                  <div>
+                    <dt>Front</dt>
+                    <dd>{activeModel.specs.frontFork}</dd>
+                  </div>
+                  <div>
+                    <dt>Rear</dt>
+                    <dd>{activeModel.specs.rearShocks}</dd>
+                  </div>
+                  <div>
+                    <dt>Brakes</dt>
+                    <dd>{activeModel.specs.brakeCaliperType}</dd>
+                  </div>
+                </dl>
+              </div>
+            </aside>
+          ) : (
+            <aside className="detailPanel emptyState">
+              <strong>No model selected</strong>
+              <span>Adjust the filters to show matching motorcycles.</span>
+            </aside>
+          )}
         </section>
 
         <section className="tableSection">
@@ -399,7 +412,7 @@ function App() {
                   <th>Model</th>
                   <th>Category</th>
                   <th>MSRP</th>
-                  <th>Dealer Avg</th>
+                  <th>Dealer/Est.</th>
                   <th>Delta</th>
                   <th>HP</th>
                   <th>Torque</th>
