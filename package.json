@@ -1,0 +1,29 @@
+{
+  "name": "harley-lineup-compare",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "crawl:lineup": "node scripts/crawl-hd-lineup.mjs",
+    "crawl:dealer-prices": "node scripts/crawl-hd-dealer-prices.mjs",
+    "crawl": "npm run crawl:lineup && npm run crawl:dealer-prices"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^5.0.4",
+    "lucide-react": "^0.468.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "vite": "^5.4.11"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.1.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.4"
+  }
+}

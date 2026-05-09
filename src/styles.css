@@ -1,0 +1,570 @@
+:root {
+  color-scheme: light;
+  --black: #000;
+  --ink: #111;
+  --muted: #5d5d5d;
+  --line: #d7d3d0;
+  --soft: #eeeceb;
+  --panel: #f7f7f6;
+  --white: #fff;
+  --orange: #f58220;
+  --orange-dark: #c95d00;
+  font-family: "Franklin Gothic ATF", "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--soft);
+  color: var(--ink);
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+}
+
+.app {
+  min-height: 100vh;
+}
+
+.masthead {
+  background: var(--black);
+  color: var(--white);
+}
+
+.utility {
+  border-bottom: 1px solid #262626;
+  color: #c9c9c9;
+  font-size: 0.78rem;
+  padding: 0.55rem clamp(1rem, 3vw, 2rem);
+  text-transform: uppercase;
+}
+
+.brandRow {
+  align-items: end;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: clamp(1.2rem, 3vw, 2.4rem) clamp(1rem, 3vw, 2rem);
+}
+
+.eyebrow,
+.cardTitleRow p,
+.panelHeader p,
+.dealerBox p,
+.metricTile p,
+.sourceBlock,
+.quickSpecs dt,
+.specBlock dt,
+.sectionTitle {
+  font-size: 0.72rem;
+  letter-spacing: 0;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  font-size: clamp(2.2rem, 7vw, 5.4rem);
+  line-height: 0.9;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.sourceBlock {
+  display: grid;
+  gap: 0.45rem;
+  justify-items: end;
+  white-space: nowrap;
+}
+
+.sourceBlock a,
+.panelHeader a {
+  color: var(--orange);
+  font-weight: 700;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+main {
+  padding-bottom: 8rem;
+}
+
+.controls {
+  background: var(--white);
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  gap: 1rem;
+  padding: 1rem clamp(1rem, 3vw, 2rem);
+}
+
+.tabs,
+.presetRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.tabs button,
+.presetRow button,
+.compareTitle button {
+  background: var(--white);
+  border: 1px solid var(--black);
+  border-radius: 0;
+  color: var(--black);
+  font-weight: 700;
+  min-height: 2.25rem;
+  padding: 0.45rem 0.75rem;
+  text-transform: uppercase;
+}
+
+.tabs button.active,
+.presetRow button.active {
+  background: var(--black);
+  color: var(--white);
+}
+
+.toolGrid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(0, 1fr) minmax(14rem, 20rem);
+}
+
+.searchBox,
+.selectBox {
+  align-items: center;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  display: flex;
+  gap: 0.65rem;
+  min-height: 3rem;
+  padding: 0 0.75rem;
+}
+
+.searchBox input,
+.selectBox select {
+  background: transparent;
+  border: 0;
+  color: var(--ink);
+  min-width: 0;
+  outline: 0;
+  width: 100%;
+}
+
+.summaryStrip {
+  display: grid;
+  gap: 1px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 1px 0;
+}
+
+.metricTile {
+  align-items: center;
+  background: var(--black);
+  color: var(--white);
+  display: flex;
+  gap: 0.9rem;
+  min-height: 6.25rem;
+  padding: 1rem clamp(1rem, 3vw, 2rem);
+}
+
+.metricTile svg {
+  color: var(--orange);
+}
+
+.metricTile strong {
+  display: block;
+  font-size: clamp(1.3rem, 2.6vw, 2.2rem);
+  line-height: 1;
+}
+
+.metricTile small {
+  color: #bdbdbd;
+}
+
+.contentGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr) minmax(20rem, 27rem);
+  padding: 1rem clamp(1rem, 3vw, 2rem);
+}
+
+.modelGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+}
+
+.modelCard,
+.detailPanel,
+.tableSection {
+  background: var(--white);
+  border: 1px solid var(--line);
+}
+
+.modelCard {
+  display: grid;
+  grid-template-rows: 11rem 1fr;
+  min-width: 0;
+}
+
+.modelCard.active {
+  border-color: var(--black);
+  box-shadow: inset 0 0 0 2px var(--black);
+}
+
+.imageStage {
+  align-items: end;
+  background: linear-gradient(180deg, #f7f7f6 0%, #e4e1de 100%);
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0.75rem;
+}
+
+.imageStage img {
+  display: block;
+  height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.cardBody {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1rem;
+}
+
+.cardTitleRow {
+  align-items: start;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+}
+
+.cardTitleRow h2,
+.panelHeader h2 {
+  font-size: 1.35rem;
+  line-height: 1;
+  margin: 0.25rem 0 0;
+  text-transform: uppercase;
+}
+
+.compareButton {
+  align-items: center;
+  background: var(--white);
+  border: 1px solid var(--black);
+  border-radius: 0;
+  display: inline-flex;
+  height: 2rem;
+  justify-content: center;
+  min-width: 2rem;
+}
+
+.compareButton.selected {
+  background: var(--orange);
+  border-color: var(--orange-dark);
+}
+
+.priceRow,
+.quickSpecs,
+.metricList {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.priceRow {
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+}
+
+.priceRow div,
+.quickSpecs div,
+.metricList div {
+  border-bottom: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+  min-width: 0;
+  padding: 0.55rem;
+}
+
+.priceRow span,
+.quickSpecs dt,
+.metricList span {
+  color: var(--muted);
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+
+.priceRow strong,
+.quickSpecs dd,
+.metricList strong {
+  font-size: 1.05rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.badgeRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.badgeRow span {
+  background: var(--black);
+  color: var(--white);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.25rem 0.4rem;
+  text-transform: uppercase;
+}
+
+.detailPanel {
+  align-self: start;
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  position: sticky;
+  top: 1rem;
+}
+
+.dealerBox {
+  background: var(--black);
+  color: var(--white);
+  display: grid;
+  gap: 0.5rem;
+  padding: 1rem;
+}
+
+.dealerBox strong {
+  display: block;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.dealerBox .sampled,
+.dealerBox .unsampled {
+  color: var(--orange);
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.dealerBox small {
+  color: #d8d8d8;
+}
+
+.specBlock {
+  border-top: 4px solid var(--black);
+  padding-top: 0.9rem;
+}
+
+.specBlock h3 {
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+}
+
+.specBlock dl {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.specBlock dt {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.specBlock dd {
+  margin: 0.2rem 0 0;
+}
+
+.tableSection {
+  margin: 0 clamp(1rem, 3vw, 2rem);
+  overflow: hidden;
+}
+
+.sectionTitle {
+  align-items: center;
+  background: var(--black);
+  color: var(--white);
+  display: flex;
+  gap: 0.6rem;
+  padding: 0.75rem 1rem;
+}
+
+.sectionTitle h2 {
+  font-size: 1rem;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.tableWrap {
+  overflow: auto;
+}
+
+table {
+  border-collapse: collapse;
+  min-width: 72rem;
+  width: 100%;
+}
+
+th,
+td {
+  border-bottom: 1px solid var(--line);
+  padding: 0.7rem 0.8rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+thead th {
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 0.72rem;
+  position: sticky;
+  text-transform: uppercase;
+  top: 0;
+  z-index: 1;
+}
+
+tbody th {
+  background: var(--white);
+  left: 0;
+  min-width: 13rem;
+  position: sticky;
+}
+
+tbody th button {
+  background: transparent;
+  border: 0;
+  display: block;
+  font-weight: 800;
+  padding: 0;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+td small,
+tbody th small {
+  color: var(--muted);
+  display: block;
+  font-size: 0.72rem;
+  margin-top: 0.2rem;
+}
+
+.compareDock {
+  background: var(--black);
+  border-top: 4px solid var(--orange);
+  bottom: 0;
+  color: var(--white);
+  left: 0;
+  padding: 0.75rem clamp(1rem, 3vw, 2rem);
+  position: fixed;
+  right: 0;
+  z-index: 5;
+}
+
+.compareTitle {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+}
+
+.compareTitle button {
+  margin-left: auto;
+}
+
+.compareModels {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.compareModels div {
+  border: 1px solid #303030;
+  padding: 0.7rem;
+}
+
+.compareModels span,
+.compareModels small {
+  display: block;
+}
+
+.compareModels span {
+  color: var(--orange);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.compareModels small {
+  color: #c9c9c9;
+}
+
+@media (max-width: 980px) {
+  .brandRow,
+  .contentGrid,
+  .toolGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .brandRow {
+    align-items: start;
+    display: grid;
+  }
+
+  .sourceBlock {
+    justify-items: start;
+  }
+
+  .summaryStrip,
+  .compareModels {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .detailPanel {
+    position: static;
+  }
+}
+
+@media (max-width: 620px) {
+  .summaryStrip,
+  .compareModels,
+  .priceRow,
+  .quickSpecs,
+  .metricList {
+    grid-template-columns: 1fr;
+  }
+
+  .modelCard {
+    grid-template-rows: 9rem 1fr;
+  }
+
+  h1 {
+    font-size: 2.45rem;
+  }
+}
